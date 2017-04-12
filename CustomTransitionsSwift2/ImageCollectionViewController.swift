@@ -26,12 +26,12 @@ class ImageCollectionViewController: UICollectionViewController {
     // MARK: UICollectionViewDataSource
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 6
+        return 30
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ImageCollectionViewCell
-        cell.catImageView.image = UIImage(named: "\(indexPath.row)")
+        cell.catImageView.image = UIImage(named: "1")
         cell.delegate = self
         return cell
     }
@@ -66,11 +66,11 @@ extension ImageCollectionViewController : UICollectionViewDelegateFlowLayout {
 extension ImageCollectionViewController: UIViewControllerTransitioningDelegate {
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return CustomDismissController(withDuration: 0.5, originFrame: tappedImage!.1, presentedImage: tappedImage!.0)
+        return CustomDismissController(withDuration: 0.3, originFrame: tappedImage!.1, presentedImage: tappedImage!.0)
     }
     
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return CustomPresentController(withDuration: 2, originFrame: tappedImage!.1, presentedImage: tappedImage!.0)
+        return CustomPresentController(withDuration: 0.3, originFrame: tappedImage!.1, presentedImage: tappedImage!.0)
     }
 }
 
@@ -80,7 +80,7 @@ extension ImageCollectionViewController:DidSelectedCell {
         let vc = storyboard.instantiateViewController(withIdentifier: "Image") as! ImageViewController
         vc.transitioningDelegate = self
         vc.image = cell.catImageView.image
-        let imagePosition = cell.convert(cell.catImageView.frame.origin, to: collectionView)
+        let imagePosition = cell.convert(cell.catImageView.frame.origin, to: self.view)
         let imageFrameAndPosition = CGRect(x: imagePosition.x, y: imagePosition.y, width: cell.catImageView.frame.width, height: cell.catImageView.frame.height)
         tappedImage = (cell.catImageView, imageFrameAndPosition)
         self.present(vc, animated: true, completion: nil)

@@ -36,7 +36,6 @@ class CustomPresentController:NSObject, UIViewControllerAnimatedTransitioning {
         let containerView = transitionContext.containerView
         guard let snapShotView = presentedImageView.snapshotView(afterScreenUpdates: false) else {return}
         snapShotView.frame = originFrame
-        snapShotView.contentMode = .center
         containerView.addSubview(snapShotView)
         presentedImageView.alpha = 0
         
