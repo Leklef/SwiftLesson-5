@@ -14,7 +14,6 @@ class ImageCollectionViewController: UICollectionViewController {
     
     fileprivate let itemsPerRow: CGFloat = 2
     fileprivate let sectionInsets = UIEdgeInsets(top: 0, left: 1, bottom: 1, right: 0)
-    var interactionController: UIPercentDrivenInteractiveTransition?
     
     var tappedImage:( UIImageView, CGRect)?
 
@@ -31,13 +30,14 @@ class ImageCollectionViewController: UICollectionViewController {
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ImageCollectionViewCell
-        cell.catImageView.image = UIImage(named: "1")
+        cell.catImageView.image = UIImage(named: "\(arc4random_uniform(5))")
         cell.delegate = self
         return cell
     }
 
 }
 
+//MARK:FlowLayout Delegate
 extension ImageCollectionViewController : UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView,
@@ -63,6 +63,8 @@ extension ImageCollectionViewController : UICollectionViewDelegateFlowLayout {
     }
 }
 
+
+//MARK: Custom Transitioning Delegate
 extension ImageCollectionViewController: UIViewControllerTransitioningDelegate {
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
@@ -74,6 +76,8 @@ extension ImageCollectionViewController: UIViewControllerTransitioningDelegate {
     }
 }
 
+
+//Take info from cell and present info in next vc
 extension ImageCollectionViewController:DidSelectedCell {
     func presentVC(cell: ImageCollectionViewCell) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
