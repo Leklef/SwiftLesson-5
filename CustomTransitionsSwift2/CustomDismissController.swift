@@ -1,54 +1,61 @@
 //
-//  CustomDismissController.swift
+//  DismissViewController.swift
 //  CustomTransitionsSwift2
 //
-//  Created by Ildar Zalyalov on 08.04.17.
+//  Created by Ленар on 12.04.17.
 //  Copyright © 2017 ru.itisIosLab. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
-class CustomDismissController: NSObject, UIViewControllerAnimatedTransitioning  {
-   
+class CustomDismissController:NSObject, UIViewControllerAnimatedTransitioning {
+    
+    var duration: TimeInterval
+    var presentedImageView: UIImageView
+    var originFrame:CGRect
+    
+    init(withDuration duration: TimeInterval, originFrame:CGRect, presentedImage:UIImageView) {
+        self.duration = duration
+        self.presentedImageView = presentedImage
+        self.originFrame = originFrame
+        
+        super.init()
+    }
+    
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return 2.0
+        return self.duration
     }
     
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        
-        let fromViewController = transitionContext.viewController(forKey: .from)
-        let toViewController = transitionContext.viewController(forKey: .to)
-        let finalFrameForVC = transitionContext.finalFrame(for: toViewController!)
+        guard let fromVC = transitionContext.viewController(forKey: .from) as? ImageViewController  else {return}
+        guard let toVC = transitionContext.viewController(forKey: .to) else {return}
         
         let containerView = transitionContext.containerView
         
+        guard let snapShotView = fromVC.catImageView.snapshotView(afterScreenUpdates: false) else {return}
+        snapShotView.frame = fromVC.catImageView.frame
         
-        guard let lFromVC = fromViewController,
-            let lToVC = toViewController
-            else { return }
+        containerView.addSubview(toVC.view)
+        containerView.sendSubview(toBack: toVC.view)
+        presentedImageView.alpha = 0
         
-        lToVC.view.frame = finalFrameForVC
-        lToVC.view.alpha = 0.5
+        containerView.addSubview(snapShotView)
         
-        containerView.addSubview(lToVC.view)
-        containerView.sendSubview(toBack: lToVC.view)
+        fromVC.view.removeFromSuperview()
         
-        let snapShotView = lFromVC.view.snapshotView(afterScreenUpdates: false)
-        snapShotView?.frame = lFromVC.view.frame
-        containerView.addSubview(snapShotView!)
-        
-        lFromVC.view.removeFromSuperview()
-        
-        UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.0, options: .curveLinear, animations: {
-            
-            lToVC.view.alpha = 1.0
-            snapShotView?.frame = lFromVC.view.frame.insetBy(dx: lFromVC.view.frame.width / 2, dy:lFromVC.view.frame.height/2)
-            
-        }) { (finished) in
-            
-            snapShotView?.removeFromSuperview()
+        toVC.view.alpha = 0
+        let finalFrameForVC = presentedImageView.frame
+        UIView.animate(withDuration: self.duration, animations: { () -> Void in
+            toVC.view.alpha = 1
+            fromVC.catImageView.frame = finalFrameForVC
+            snapShotView.frame = finalFrameForImage
+            self.presentedImageView.alpha = 1
+        }, completion: { (completed: Bool) -> Void in
+            self.presentedImageView.alpha = 1
+            snapShotView.removeFromSuperview()
             transitionContext.completeTransition(true)
-        }
+        })
     }
+    
 }
