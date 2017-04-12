@@ -31,7 +31,7 @@ class CustomPresentController:NSObject, UIViewControllerAnimatedTransitioning {
         guard let fromVC = transitionContext.viewController(forKey: .from)  else {return}
         guard let toVC = transitionContext.viewController(forKey: .to) as? ImageViewController else {return}
         
-        let finalFrameForImage = toVC.catImageView.frame
+        let finalFrameToImage = toVC.catImageView.frame
         
         let containerView = transitionContext.containerView
         guard let snapShotView = presentedImageView.snapshotView(afterScreenUpdates: false) else {return}
@@ -42,7 +42,7 @@ class CustomPresentController:NSObject, UIViewControllerAnimatedTransitioning {
         
         UIView.animate(withDuration: self.duration, animations: { () -> Void in
             fromVC.view.alpha = 0
-            snapShotView.frame = finalFrameForImage
+            snapShotView.frame = finalFrameToImage
         }, completion: { (completed: Bool) -> Void in
             fromVC.view.alpha = 1
             self.presentedImageView.alpha = 1

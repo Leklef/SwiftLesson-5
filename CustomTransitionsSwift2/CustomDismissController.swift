@@ -32,7 +32,6 @@ class CustomDismissController:NSObject, UIViewControllerAnimatedTransitioning {
         guard let toVC = transitionContext.viewController(forKey: .to) else {return}
         
         let containerView = transitionContext.containerView
-        
         guard let snapShotView = fromVC.catImageView.snapshotView(afterScreenUpdates: false) else {return}
         snapShotView.frame = fromVC.catImageView.frame
         
@@ -45,12 +44,9 @@ class CustomDismissController:NSObject, UIViewControllerAnimatedTransitioning {
         fromVC.view.removeFromSuperview()
         
         toVC.view.alpha = 0
-        let finalFrameForVC = presentedImageView.frame
         UIView.animate(withDuration: self.duration, animations: { () -> Void in
             toVC.view.alpha = 1
-            fromVC.catImageView.frame = finalFrameForVC
-            snapShotView.frame = finalFrameForImage
-            self.presentedImageView.alpha = 1
+            snapShotView.frame = self.originFrame
         }, completion: { (completed: Bool) -> Void in
             self.presentedImageView.alpha = 1
             snapShotView.removeFromSuperview()
