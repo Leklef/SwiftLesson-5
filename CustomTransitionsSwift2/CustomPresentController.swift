@@ -11,14 +11,12 @@ import UIKit
 
 class CustomPresentController:NSObject, UIViewControllerAnimatedTransitioning {
     
-    var duration: TimeInterval
-    var originFrame: CGRect
-    var presentedImageView: UIImageView
+    fileprivate var duration: TimeInterval
+    fileprivate var presentedImageView: UIImageView
     
-    init(withDuration duration: TimeInterval, originFrame: CGRect, presentedImage:UIImageView) {
+    init(withDuration duration: TimeInterval, presentedImageView:UIImageView) {
         self.duration = duration
-        self.originFrame = originFrame
-        self.presentedImageView = presentedImage
+        self.presentedImageView = presentedImageView
         
         super.init()
     }
@@ -31,22 +29,26 @@ class CustomPresentController:NSObject, UIViewControllerAnimatedTransitioning {
         guard let fromVC = transitionContext.viewController(forKey: .from)  else {return}
         guard let toVC = transitionContext.viewController(forKey: .to) as? ImageViewController else {return}
         
-        let finalFrameToImage = toVC.catImageView.frame
-        
         let containerView = transitionContext.containerView
-        guard let snapShotView = presentedImageView.snapshotView(afterScreenUpdates: false) else {return}
-        snapShotView.frame = originFrame
-        containerView.addSubview(snapShotView)
+        
+        let fromFrame = presentedImageView.convert(presentedImageView.bounds, to: containerView)
+        let finalFrame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+        
+        let newImageView = UIImageView(frame: fromFrame)
+        newImageView.image = presentedImageView.image
+        newImageView.contentMode = .scaleAspectFit
+        containerView.addSubview(newImageView)
+        
         presentedImageView.alpha = 0
         
         UIView.animate(withDuration: self.duration, animations: { () -> Void in
             fromVC.view.alpha = 0
-            snapShotView.frame = finalFrameToImage
+            newImageView.frame = finalFrame
         }, completion: { (completed: Bool) -> Void in
             fromVC.view.alpha = 1
             self.presentedImageView.alpha = 1
             containerView.addSubview(toVC.view)
-            snapShotView.removeFromSuperview()
+            newImageView.removeFromSuperview()
             transitionContext.completeTransition(true)
         })
     }

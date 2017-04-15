@@ -15,7 +15,7 @@ class ImageCollectionViewController: UICollectionViewController {
     fileprivate let itemsPerRow: CGFloat = 2
     fileprivate let sectionInsets = UIEdgeInsets(top: 0, left: 1, bottom: 1, right: 0)
     
-    var tappedImage:( UIImageView, CGRect)?
+    var tappedImageView:UIImageView?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,11 +68,11 @@ extension ImageCollectionViewController : UICollectionViewDelegateFlowLayout {
 extension ImageCollectionViewController: UIViewControllerTransitioningDelegate {
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return CustomDismissController(withDuration: 0.3, originFrame: tappedImage!.1, presentedImage: tappedImage!.0)
+        return CustomDismissController(withDuration: 0.3, presentedImageView: tappedImageView!)
     }
     
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return CustomPresentController(withDuration: 0.3, originFrame: tappedImage!.1, presentedImage: tappedImage!.0)
+        return CustomPresentController(withDuration: 0.3, presentedImageView: tappedImageView!)
     }
 }
 
@@ -84,9 +84,7 @@ extension ImageCollectionViewController:DidSelectedCell {
         let vc = storyboard.instantiateViewController(withIdentifier: "Image") as! ImageViewController
         vc.transitioningDelegate = self
         vc.image = cell.catImageView.image
-        let imagePosition = cell.convert(cell.catImageView.frame.origin, to: self.view)
-        let imageFrameAndPosition = CGRect(x: imagePosition.x, y: imagePosition.y, width: cell.catImageView.frame.width, height: cell.catImageView.frame.height)
-        tappedImage = (cell.catImageView, imageFrameAndPosition)
+        tappedImageView = cell.catImageView
         self.present(vc, animated: true, completion: nil)
     }
 }

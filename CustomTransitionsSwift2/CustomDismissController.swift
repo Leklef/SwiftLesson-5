@@ -13,12 +13,10 @@ class CustomDismissController:NSObject, UIViewControllerAnimatedTransitioning {
     
     var duration: TimeInterval
     var presentedImageView: UIImageView
-    var originFrame:CGRect
     
-    init(withDuration duration: TimeInterval, originFrame:CGRect, presentedImage:UIImageView) {
+    init(withDuration duration: TimeInterval, presentedImageView:UIImageView) {
         self.duration = duration
-        self.presentedImageView = presentedImage
-        self.originFrame = originFrame
+        self.presentedImageView = presentedImageView
         
         super.init()
     }
@@ -32,24 +30,30 @@ class CustomDismissController:NSObject, UIViewControllerAnimatedTransitioning {
         guard let toVC = transitionContext.viewController(forKey: .to) else {return}
         
         let containerView = transitionContext.containerView
-        guard let snapShotView = fromVC.catImageView.snapshotView(afterScreenUpdates: false) else {return}
-        snapShotView.frame = fromVC.catImageView.frame
+        
+        let toFrame = presentedImageView.convert(presentedImageView.bounds, to: containerView)
+        let fromFrame = fromVC.catImageView.convert(fromVC.catImageView.bounds, to: containerView)
+        
+        let newImageView = UIImageView(frame: fromFrame)
+        newImageView.image = presentedImageView.image
+        newImageView.contentMode = .scaleAspectFit
+        containerView.addSubview(newImageView)
         
         containerView.addSubview(toVC.view)
         containerView.sendSubview(toBack: toVC.view)
         presentedImageView.alpha = 0
         
-        containerView.addSubview(snapShotView)
+        containerView.addSubview(newImageView)
         
         fromVC.view.removeFromSuperview()
         
         toVC.view.alpha = 0
         UIView.animate(withDuration: self.duration, animations: { () -> Void in
             toVC.view.alpha = 1
-            snapShotView.frame = self.originFrame
+            newImageView.frame = toFrame
         }, completion: { (completed: Bool) -> Void in
             self.presentedImageView.alpha = 1
-            snapShotView.removeFromSuperview()
+            newImageView.removeFromSuperview()
             transitionContext.completeTransition(true)
         })
     }
